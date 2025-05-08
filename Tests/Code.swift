@@ -14,8 +14,8 @@ final class JSObject {
         self.jsValue = constructor.construct(withArguments: [])!
     }
 
-    subscript(dynamicMember member: String) -> (() -> Void)? {
-        guard jsValue.hasProperty(member) else { return nil }
+    subscript(dynamicMember member: String) -> (() -> Void) {
+        guard jsValue.hasProperty(member) else { return {} }
         return {
             _ = self.jsValue.invokeMethod(member, withArguments: [])
         }
@@ -45,10 +45,10 @@ final class JSObject {
 final class Tests: XCTestCase {
     func test_increment_callsOnUpdateCallbackWithUpdatedValue() {
         var count = 0
-        let object = JSObject(js: jsSource, key: "ViewModel")
+        let vm = JSObject(js: jsSource, key: "ViewModel")
         let e = expectation(description: "Wait for callback")
-        object.onUpdate = { count = $0 as! Int ; e.fulfill() }
-        object.increment?()
+        vm.onUpdate = { count = $0 as! Int ; e.fulfill() }
+        vm.increment()
         wait(for: [e], timeout: 1)
         XCTAssertEqual(count, 1)
     }
