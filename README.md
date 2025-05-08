@@ -1,8 +1,8 @@
-# js-bridge-swift
+# JSObject
 
 > Dynamically interact with JavaScript objects from Swift using `JavaScriptCore`.
 
-This was a small exploration into bridinge Swift and Javascript through dynamic objects instantiable with js code.
+This was a small exploration into bridging Swift and Javascript through dynamic objects instantiable with js code.
 
 ## ✅ What it supports
 
