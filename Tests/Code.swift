@@ -21,12 +21,14 @@ final class JSObject {
         }
     }
 
-    subscript(dynamicMember member: String) -> ((Any) -> Void)? {
+    subscript<T>(dynamicMember member: String) -> ((T) -> Void)? {
             get { nil }
             set {
                 guard let newValue = newValue else { return }
                 let block: @convention(block) (JSValue) -> Void = { jsVal in
-                    newValue(jsVal.toObject()!)
+                    if let jsVal = jsVal.toObject(), let asT = jsVal as? T {
+                        newValue(asT)
+                    }
                 }
                 callbacks[member] = block
                 jsValue.setObject(block, forKeyedSubscript: member as NSString)
@@ -47,7 +49,7 @@ final class Tests: XCTestCase {
         var count = 0
         let vm = JSObject(js: jsSource, key: "ViewModel")
         let e = expectation(description: "Wait for callback")
-        vm.onUpdate = { count = $0 as! Int ; e.fulfill() }
+        vm.onUpdate = { count = $0 ; e.fulfill() }
         vm.increment()
         wait(for: [e], timeout: 1)
         XCTAssertEqual(count, 1)
