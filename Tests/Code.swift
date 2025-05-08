@@ -1,6 +1,7 @@
 import JavaScriptCore
 import XCTest
 
+@dynamicMemberLookup
 final class JSObject {
     private let context: JSContext
     private let jsValue: JSValue
@@ -13,17 +14,19 @@ final class JSObject {
         self.jsValue = constructor.construct(withArguments: [])!
     }
 
-    func set(_ callbackName: String, callback: @escaping (Any) -> Void) {
+    subscript(dynamicMember member: String) -> (() -> Void)? {
+        guard jsValue.hasProperty(member) else { return nil }
+        return {
+            _ = self.jsValue.invokeMethod(member, withArguments: [])
+        }
+    }
+
+    func set(_ name: String, callback: @escaping (Any) -> Void) {
         let block: @convention(block) (JSValue) -> Void = { value in
             callback(value.toObject()!)
         }
-        
-        callbacks[callbackName] = block
-        jsValue.setObject(block, forKeyedSubscript: callbackName as NSString)
-    }
-
-    func invoke(_ methodKey: String, args: [Any] = []) {
-        _ = jsValue.invokeMethod(methodKey, withArguments: args)
+        callbacks[name] = block
+        jsValue.setObject(block, forKeyedSubscript: name as NSString)
     }
 }
 
@@ -33,7 +36,7 @@ final class Tests: XCTestCase {
         let object = JSObject(js: jsSource, key: "ViewModel")
         let e = expectation(description: "Wait for callback")
         object.set("onUpdate") { count = $0 as! Int ; e.fulfill() }
-        object.invoke("increment")
+        object.increment?()
         wait(for: [e], timeout: 1)
         XCTAssertEqual(count, 1)
     }
