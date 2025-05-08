@@ -5,26 +5,26 @@ import JavaScriptCore
 import XCTest
 
 @dynamicMemberLookup
-final class JSObject {
+public final class JSObject {
     private let context: JSContext
     private let jsValue: JSValue
     private var callbacks = [String: Any]()
 
-    init(js: String, key: String) {
+   public init(js: String, key: String) {
         self.context = JSContext()!
         context.evaluateScript(js)
         let constructor = context.objectForKeyedSubscript(key)!
         self.jsValue = constructor.construct(withArguments: [])!
     }
 
-    subscript(dynamicMember member: String) -> (() -> Void) {
+    public subscript(dynamicMember member: String) -> (() -> Void) {
         guard jsValue.hasProperty(member) else { return {} }
         return {
             _ = self.jsValue.invokeMethod(member, withArguments: [])
         }
     }
 
-    subscript<T>(dynamicMember member: String) -> ((T) -> Void)? {
+    public subscript<T>(dynamicMember member: String) -> ((T) -> Void)? {
             get { nil }
             set {
                 guard let newValue = newValue else { return }

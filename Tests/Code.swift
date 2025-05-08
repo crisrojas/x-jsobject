@@ -1,6 +1,6 @@
 import JavaScriptCore
 import XCTest
-@testable import JSObject
+import JSObject
 
 
 final class Tests: XCTestCase {
