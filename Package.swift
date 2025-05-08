@@ -17,6 +17,6 @@ let package = Package(
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
             ]
         ),
-        .testTarget(name: "JSObjectTests")
+        .testTarget(name: "JSObjectTests", dependencies: ["JSObject"])
     ]
 )
