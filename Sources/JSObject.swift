@@ -7,7 +7,7 @@
 import ArgumentParser
 
 @main
-struct JSWrapper: ParsableCommand {
+struct JSObject: ParsableCommand {
     mutating func run() throws {
         print("Hello, world!")
     }
